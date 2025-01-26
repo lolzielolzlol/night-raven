@@ -1,0 +1,79 @@
+import sys
+
+class Room:
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+        self.exits = {}
+        
+    def set_exit(self, direction, room):
+        self.exits[direction] = room
+        
+    def get_exit(self, direction):
+        return self.exits.get(direction)
+    
+    def describe(self):
+        print(self.description)
+        print("Exits: ", ", ".join(self.exits.keys()) if self.exits else "None")
+        
+
+class Player:
+    def __init__(self, starting_room):
+        self.current_room = starting_room
+    
+    def move(self, direction):
+        next_room = self.current_room.get_exit(direction)
+        if next_room:
+            self.current_room = next_room
+            print(f"\nYou moved to {self.current_room.name}.")
+            self.current_room.describe()
+        else:
+            print("\nYou can't go that way.")
+    
+    def look(self):
+        self.current_room.describe()
+
+
+def start_game():
+    # Create rooms
+    room1 = Room("Living Room", "A cozy living room with a couch and a fireplace.")
+    room2 = Room("Kitchen", "A bright kitchen with a table and a fridge.")
+    room3 = Room("Bedroom", "A calm bedroom with a bed and a nightstand.")
+    room4 = Room("Bathroom", "A small bathroom with a shower and a mirror.")
+    
+    # Set up exits (connections between rooms)
+    room1.set_exit("north", room2)
+    room1.set_exit("east", room3)
+    room2.set_exit("south", room1)
+    room3.set_exit("west", room1)
+    room3.set_exit("north", room4)
+    room4.set_exit("south", room3)
+    
+    # Initialize player in the starting room
+    player = Player(room1)
+    
+    print("Welcome to the 2D Adventure Game!")
+    print("You are in a mysterious house.")
+    player.look()
+    
+    # Game loop
+    while True:
+        command = input("\nWhat do you want to do? (look/move <direction>/quit): ").lower()
+        
+        if command == "quit":
+            print("\nThanks for playing! Goodbye.")
+            sys.exit(0)
+        
+        elif command == "look":
+            player.look()
+        
+        elif command.startswith("move"):
+            direction = command.split(" ")[1]
+            player.move(direction)
+        
+        else:
+            print("\nInvalid command. Try again.")
+
+# Start the game
+if __name__ == "__main__":
+    start_game()
